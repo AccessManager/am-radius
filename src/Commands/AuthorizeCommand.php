@@ -6,8 +6,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use AccessManager\Radius\User;
-use AccessManager\Radius\Authenticate;
-use AccessManager\Radius\Authorize;
+use AccessManager\Radius\Authenticate\Authenticate;
+use AccessManager\Radius\Authorize\Authorize;
 
 
 class AuthorizeCommand extends command {
