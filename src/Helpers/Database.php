@@ -13,7 +13,7 @@ class Database {
 	{
 		$capsule = new Capsule;
 
-		$config = require_once __DIR__."/../../../../app/config/database.php";
+		$config = require_once __DIR__."/../../../../../app/config/database.php";
 		$capsule->addConnection($config['connections']['mysql']);
 
 		$capsule->setFetchMode(PDO::FETCH_CLASS);
