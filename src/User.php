@@ -118,6 +118,11 @@ class User {
 		}
 	}
 
+	public function __toString()
+	{
+		return $this->uname;
+	}
+
 	public function __construct($uname)
 	{
 		DB::connect();

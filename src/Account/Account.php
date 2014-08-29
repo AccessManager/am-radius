@@ -1,6 +1,7 @@
 <?php
 namespace AccessManager\Radius\Account;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use AccessManager\Radius\Authenticate\PolicySchema;
 use AccessManager\Radius\Authorize\PolicyAttributes;
 use AccessManager\Radius\Authorize\PolicySchemaAttributes;
 use AccessManager\Radius\User;
@@ -37,8 +38,8 @@ class Account {
 	{
 		$policy = $this->user->getPolicy();
 
-		if( is_a($policy, 'AccessManager\Radius\Authenticate\PolicySchema') ) {
-			$this->policy = new AccountingPolicySchema($user, $policy->{date('l')}(), $this->sessionTime, $this->inputOctets + $this->outputOctets);
+		if( $policy instanceof PolicySchema ) {
+			$this->policy = new AccountingPolicySchema($user, $this->tpl, $this->sessionTime, $this->inputOctets + $this->outputOctets);
 		} else {
 			$this->policy = new AccountingPolicy($user, $this->sessionTime, $this->inputOctets + $this->outputOctets);
 		}
@@ -126,7 +127,7 @@ class Account {
 		$this->user = $user;
 		$policy = $this->user->getPolicy();
 
-		if( is_a($policy,'AccessManager\Radius\Lib\PolicySchema') ) {
+		if( $policy instanceof PolicySchema ) {
 			$this->tpl = $policy->{date('l')}();
 			$this->policy = new AccountingPolicySchema($user, $this->tpl, $this->sessionTime, $this->inputOctets + $this->outputOctets );
 		} else {

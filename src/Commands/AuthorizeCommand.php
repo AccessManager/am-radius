@@ -23,17 +23,16 @@ class AuthorizeCommand extends command {
 	{
 		$username = $input->getArgument('username');
 
-		$user = User::find($username)->fetchAccount();
-		$authenticate = new Authenticate($user);
+		$user = ( new User($username) )->fetchAccount();
 
-		$authenticate->checkAccountStatus()
+		( new Authenticate( $user ) )
+					 ->checkAccountStatus()
 					 ->checkRechargeStatus()
 					 ->isAllowed()
 					 ->checkQuotaStatus();
 
-		$authorize = new Authorize($user);
-
-		$authorize->makeCheck()
+		( new Authorize($user) )
+					->makeCheck()
 				 	->makeReply()
 				 	->updateRadius();
 	}

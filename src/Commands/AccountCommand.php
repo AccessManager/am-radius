@@ -65,15 +65,15 @@ class AccountCommand extends command {
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$username = $input->getArgument('username');
+			 $username = $input->getArgument('username');
 		$acctsessionid = $input->getOption('acctsessionid');
-		$acctuniqueid = $input->getOption('acctuniqueid');
+		 $acctuniqueid = $input->getOption('acctuniqueid');
 
-		if(! $username OR ! $acctsessionid OR ! $acctuniqueid ) {
+		if( ! $username || ! $acctsessionid || ! $acctuniqueid ) {
 			$output->writeln("Insufficient/Invalid parameters provided.");
 			exit();
 		}
-		$account = new Account( User::find($username)->fetchAccount($acctsessionid, $acctuniqueid) );
+		$account = new Account( ( new User($username) )->fetchAccount($acctsessionid, $acctuniqueid) );
 
 		  $sessiontime = $input->getOption('sessiontime');
 		  $inputoctets = $input->getOption('inputoctets');
