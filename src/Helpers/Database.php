@@ -9,8 +9,6 @@ use Illuminate\Container\Container;
 
 class Database extends Capsule{
 
-	public static $connected = NULL;
-
 	public static function connect()
 	{
 		if( static::$instance === NULL ) {
@@ -21,7 +19,6 @@ class Database extends Capsule{
 			$instance->setFetchMode(PDO::FETCH_CLASS);
 			$instance->setEventDispatcher(new Dispatcher( new Container ) );
 			$instance->setAsGlobal();
-			$instance->bootEloquent();
 		}
 		
 	}
