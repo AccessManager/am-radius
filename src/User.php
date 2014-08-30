@@ -20,10 +20,11 @@ class User {
 	public function fetchAccount($acctsessionid = NULL, $acctuniqueid = NULL)
 	{
 		$q = Capsule::table('user_accounts as u')
-						->select('u.uname','u.status','u.clear_pword',
-							'r.time_limit','r.data_limit','r.expiration','r.aq_invocked',
-							'v.plan_type','v.policy_type','v.policy_id','v.sim_sessions','v.interim_updates',
-							'l.limit_type','l.aq_access','l.aq_policy')
+						->select('u.uname','u.status','u.clear_pword'
+							,'r.time_limit','r.data_limit','r.expiration','r.aq_invocked'
+							,'v.plan_type','v.policy_type','v.policy_id','v.sim_sessions','v.interim_updates'
+							,'l.limit_type','l.aq_access','l.aq_policy'
+							)
 						->leftJoin('user_recharges as r','r.user_id','=','u.id')
 						->leftJoin('prepaid_vouchers as v','v.id','=','r.voucher_id')
 						->leftJoin('voucher_limits as l','l.id','=','v.limit_id')
@@ -42,6 +43,7 @@ class User {
 							'a.acctsessiontime','r.active_tpl');
 		}
 		$this->user = $q->first();
+		
 		if( $this->user == NULL )
 			reject("No such user: $this->uname");
 

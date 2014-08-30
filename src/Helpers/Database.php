@@ -7,28 +7,25 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 
-class Database {
+class Database extends Capsule{
+
+	public static $connected = NULL;
 
 	public static function connect()
 	{
-		$capsule = new Capsule;
-
-		$db = require_once __DIR__."/../../../../../../app/config/database.php";
-		$config = array(
-			'driver'    => 'mysql',
-			'host'      => 'localhost',
-			'database'  => 'am-laravel',
-			'username'  => 'root',
-			'password'  => 'Fj460192dk',
-			'charset'   => 'utf8',
-			'collation' => 'utf8_unicode_ci',
-			'prefix'    => '',
-		);
-		$capsule->addConnection($config);
-
-		$capsule->setFetchMode(PDO::FETCH_CLASS);
-		$capsule->setEventDispatcher( new Dispatcher( new Container ) );
-		$capsule->setAsGlobal();
-		// return $capsule;
+		if( static::$instance === NULL ) {
+			$db = require_once __DIR__."/../../../../../app/config/database.php";
+			$configdb = $db['connections']['mysql'];
+			$instance = new self;
+			$instance->addConnection($configdb);
+			$instance->setFetchMode(PDO::FETCH_CLASS);
+			$instance->setEventDispatcher(new Dispatcher( new Container ) );
+			$instance->setAsGlobal();
+			$instance->bootEloquent();
+		}
+		
 	}
+
 }
+
+//end of file Database.php
