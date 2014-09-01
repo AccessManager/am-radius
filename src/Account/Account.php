@@ -118,8 +118,7 @@ class Account {
 	{
 		$exec = "echo \" User-Name={$this->user->uname}, Framed-IP-Address= {$session->framedipaddress},".
                                      " Acct-Session-Id= {$session->acctsessionid} \" | radclient {$session->nasipaddress}:3799 disconnect {$session->secret} ";
-		$process = new Process($exec);
-		$process->start();
+		(new Process($exec) )->start();
 	}
 
 	public function __construct(User $user)

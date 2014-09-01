@@ -45,9 +45,9 @@ class Authorize {
 					->where('username', $this->user)
 					->delete();
 			Capsule::table('radcheck')
-					->insert($this->radcheck);
+					->insert($this->check);
 			Capsule::table('radreply')
-					->insert($this->radReply);
+					->insert($this->reply);
 		});
 	}
 
