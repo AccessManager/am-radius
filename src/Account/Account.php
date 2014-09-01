@@ -43,6 +43,10 @@ class Account {
 		} else {
 			$this->policy = new AccountingPolicy($user, $this->sessionTime, $this->inputOctets + $this->outputOctets);
 		}
+		if ( $this->policy->requestCoA() )
+			$this->CoA();
+		if( $this->policy->requestDisconnect())
+			$this->Disconnect();
 	}
 
 	public function countTime()
@@ -69,6 +73,14 @@ class Account {
 		}
 	}
 
+	public function Disconnect()
+	{
+		$this->_fetchActiveSessions();
+		foreach($this->activeSessions as $session ) {
+			$this->_invokeDisconnect($session);
+		}
+	}
+
 	private function _fetchActiveSessions()
 	{
 		if( $this->activeSessions == NULL ) {
@@ -76,7 +88,7 @@ class Account {
 									->select('a.nasipaddress','n.secret','a.servicetype',
 											'a.framedipaddress','a.acctsessionid')
 									->join('nas AS n','n.nasname','=','a.nasipaddress')
-									->where('a.username', $this->user->uname)
+									->where('a.username', $this->user)
 									->where('a.acctstoptime', NULL)
 									->get();
 		}
@@ -84,7 +96,10 @@ class Account {
 
 	public function updateDatabase()
 	{
-		
+		$q = Capsule::table('user_recharges')
+				->where('uname',$this->user);
+		$q->decrement('time_limit', $this->countableTime);
+		$q->decrement('data_limit', $this->countableData);
 	}
 
 	private function _invokeCoA($session)
@@ -94,8 +109,12 @@ class Account {
 
                         $this->shell . " \" | radclient {$session->nasipaddress}:3799 coa {$session->secret}";
 
-		$process = new Process($exec);
-		$process->start();
+        $process = new Process($exec);
+        while($process->isRunning() )
+        	sleep(3);
+		Capsule::table('user_recharges')
+					->where('uname',$this->user)
+					->update(['aq_invocked'=>1]);
 	}
 
 	private function _makeShell()

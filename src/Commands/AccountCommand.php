@@ -43,6 +43,9 @@ class AccountCommand extends command {
 		$account->takeTime($sessiontime);
 		$account->takeData($inputoctets, $inputgigs, $outputoctets, $outputgigs);
 		$account->setupAccounting();
+		$account->countTime();
+		$account->countData();
+		$account->updateDatabase();
 	}
 	
 }
