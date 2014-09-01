@@ -46,25 +46,25 @@ class PolicySchemaAttributes Implements  AttributesInterface {
 	{
 		if( $this->tpl->haveFullDayAccess() ) {
 			if( $this->tpl->isAccountable() && $this->user->limitExpired() ) {
-				return $this->_addReply(['Rate-Limit'=>$this->user->aq_policy]);
+				return $this->_addReply(['Mikrotik-Rate-Limit'=>$this->user->aq_policy]);
 			} else {
-			return $this->_addReply(['Rate-Limit'=>$this->tpl->bw_policy]);
+			return $this->_addReply(['Mikrotik-Rate-Limit'=>$this->tpl->bw_policy]);
 			}
 		}
 
 		if( $this->tpl->isInPrimaryTime() ) {
 			if( $this->tpl->isPrimaryAccountable() && $this->user->limitExpired() ) {
-				return $this->_addReply(['Rate-Limit'=>$this->user->aq_policy]);
+				return $this->_addReply(['Mikrotik-Rate-Limit'=>$this->user->aq_policy]);
 			} else {
-				return $this->_addReply( ['Rate-Limit'=>$this->tpl->pr_policy] );
+				return $this->_addReply( ['Mikrotik-Rate-Limit'=>$this->tpl->pr_policy] );
 			}
 		}
 
 		if( $this->tpl->isInSecondaryTime() ) {
 			if( $this->tpl->isSecondaryAccountable() && $this->user->limitExpired() ) {
-				return $this->_addReply(['Rate-Limit'=>$this->user->aq_policy]);
+				return $this->_addReply(['Mikrotik-Rate-Limit'=>$this->user->aq_policy]);
 			} else {
-				return $this->_addReply( ['Rate-Limit'=>$this->tpl->sec_policy] );
+				return $this->_addReply( ['Mikrotik-Rate-Limit'=>$this->tpl->sec_policy] );
 			}
 		}
 	}

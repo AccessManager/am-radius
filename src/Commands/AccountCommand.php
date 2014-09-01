@@ -13,73 +13,32 @@ class AccountCommand extends command {
 	{
 		$this->setName("am:account")
 			->setDescription("Takes care of accounting user's data.")
-			->addArgument("username",InputArgument::REQUIRED, "Require username for Accounting.")
-			->addOption(
-						"acctsessionid",
-						NULL,
-						InputOption::VALUE_REQUIRED,
-						"acctsessionid required to fetch session information",
-						0)
-			->addOption(
-						"acctuniqueid",
-						NULL,
-						InputOption::VALUE_REQUIRED,
-						"acctuniqueid required to fetch session information",
-						0
-				)
-			->addOption(
-						"sessiontime",
-						NULL,
-						InputOption::VALUE_REQUIRED,
-						"SessionTime required for counting time."
-				)
-			->addOption(
-						"inputoctets",
-						NULL,
-						InputOption::VALUE_REQUIRED,
-						"InputOctets required for counting data.",
-						0
-				)
-			->addOption(
-						"inputoctetgigawords",
-						NULL,
-						InputOption::VALUE_REQUIRED,
-						"InputOctetGigawords required for counting data.",
-						0
-				)
-			->addOption(
-						"outputoctets",
-						NULL,
-						InputOption::VALUE_REQUIRED,
-						'OutputOctets required for counting data.',
-						0
-				)
-			->addOption(
-						"OutputOctetGigawords",
-						NULL,
-						InputOption::VALUE_REQUIRED,
-						'OutputOctetGigawords required for counting data.',
-						0
-				);
+			->addArgument("params",InputArgument::REQUIRED, "Require params for Accounting.");
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-			 $username = $input->getArgument('username');
-		$acctsessionid = $input->getOption('acctsessionid');
-		 $acctuniqueid = $input->getOption('acctuniqueid');
-
-		if( ! $username || ! $acctsessionid || ! $acctuniqueid ) {
-			$output->writeln("Insufficient/Invalid parameters provided.");
-			exit();
+		 $z = $input->getArgument('params');
+		$attributes = parseAttributes($z);
+		$params = ['User-Name','Acct-Session-Id','Acct-Unique-Session-Id',
+					'Acct-Input-Octets','Acct-Output-Octets','Acct-Input-Gigawords',
+					'Acct-Output-Gigawords','Acct-Session-Time'];
+		foreach($params as $param) {
+			if( ! array_key_exists($param, $attributes))
+				$output->writeln("Insufficient/Invalid parameters provided.");
+				exit();
 		}
-		$account = new Account( ( new User($username) )->fetchAccount($acctsessionid, $acctuniqueid) );
+	
+	 		 $username = $params['User-Name'];
+		$acctsessionid = $params['Acct-Session-Id'];
+		 $acctuniqueid = $params['Acct-Unique-Session-Id'];
+		  $sessiontime = $params['Acct-Session-Time'];
+		  $inputoctets = $params['Acct-Input-Octets'];
+		 $outputoctets = $params['Acct-Output-Octets'];
+			$inputgigs = $params['Acct-Input-Gigawords'];
+		   $outputgigs = $params['Acct-Output-Gigawords'];
 
-		  $sessiontime = $input->getOption('sessiontime');
-		  $inputoctets = $input->getOption('inputoctets');
-		 $outputoctets = $input->getOption('outputoctets');
-			$inputgigs = $input->getOption('inputoctetgigawords');
-		   $outptugigs = $input->getOption('outputoctetgigawords');
+		$account = new Account( ( new User($username) )->fetchAccount($acctsessionid, $acctuniqueid) );
 
 		$account->takeTime($sessiontime);
 		$account->takeData($inputoctets, $inputgigs, $outputoctets, $outputgigs);

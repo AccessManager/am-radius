@@ -27,8 +27,8 @@ class PolicyAttributes Implements AttributesInterface {
 	public function makeBWPolicy()
 	{
 		if( $this->user->isLimited() && $this->user->limitExpired() )
-			return $this->_addReply(['Rate-Limit' => $this->user->aq_policy]);
-		return $this->_addReply(['Rate-Limit' => $this->user->getPolicy()->bw_policy]);
+			return $this->_addReply(['Mikrotik-Rate-Limit' => $this->user->aq_policy]);
+		return $this->_addReply(['Mikrotik-Rate-Limit' => $this->user->getPolicy()->bw_policy]);
 	}
 
 }

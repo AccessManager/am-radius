@@ -31,12 +31,12 @@ trait AttributesHelper {
 			$limit = $this->user->data_limit + $sessionData;
 			if( $limit >= FOUR_GB ) {
 				$this->_addReply([
-					'Total-Limit-Gigawords'	=> intval($limit / FOUR_GB),
+					'Mikrotik-Total-Limit-Gigawords'	=> intval($limit / FOUR_GB),
 					]);
 				$limit = bcmod($limit, FOUR_GB);
 			}
 			return $this->_addReply([
-					'Total-Limit'	=>	$limit,
+					'Mikrotik-Total-Limit'	=>	$limit,
 					]);
 		}
 		return $this->_unlimitedData();
@@ -47,7 +47,7 @@ trait AttributesHelper {
 		foreach ($arr as $k => $v) {
 			$this->check[] = [
 						 'username'	=> 	$this->user->uname,
-							   'op'	=>	'==',
+							   'op'	=>	':=',
 						'attribute' =>	$k,
 							'value' =>	$v,
 						];
@@ -73,7 +73,7 @@ trait AttributesHelper {
 
 	private function _unlimitedData()
 	{
-		$this->_addReply(['Total-Limit'=>0]);
+		$this->_addReply(['Mikrotik-Total-Limit'=>0]);
 	}
 
 }
