@@ -3,6 +3,7 @@
 namespace AccessManager\Radius\Authenticate;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use AccessManager\Radius\Helpers\UserProfile;
+use AccessManager\Radius\Lib\PolicySchema;
 
 class Authenticate {
 
@@ -27,9 +28,8 @@ class Authenticate {
 	{
 		$policy = $this->user->getPolicy();
 
-		if( is_a($policy, 'AccessManager\Radius\Lib\PolicySchema') ) {
-			$today = date('l');
-			$tpl = $policy->$today();
+		if( $policy instanceof PolicySchema ) {
+			$tpl = $policy->{date('l')}();
 			
 			switch ($tpl->access) {
 				case ALLOWED:

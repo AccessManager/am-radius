@@ -10,12 +10,16 @@ function reject($string)
 function parseAttributes($z)
 {
 	$output = preg_replace("/\s+[=]\s+/",'=', $z);
+	$output = preg_replace("/\s+/",' ',$output);
+	$output = explode(' ',$output);
 	$result = [];
-	foreach(explode(' ', $output) as $keyvalue) {
-		if(strpos($keyvalue,'=') ) {
-			list($k,$v) = explode('=',$keyvalue);
-			$result[trim($k)] = trim($v,'"');
-		}
-	}
-	return $result;
+    foreach($output as $pair) {
+            if(strpos($pair,'=') ){
+                    list($k,$v) = explode('=',$pair);
+                    $result[$k] = trim($v,'"');
+            }
+    }
+    return $result;
 }
+
+//end of file Helpers.php

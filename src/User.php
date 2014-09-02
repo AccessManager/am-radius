@@ -20,7 +20,7 @@ class User {
 	public function fetchAccount($acctsessionid = NULL, $acctuniqueid = NULL)
 	{
 		$q = Capsule::table('user_accounts as u')
-						->select('u.uname','u.status','u.clear_pword'
+						->select('u.uname','u.status','u.clear_pword','u.id'
 							,'r.time_limit','r.data_limit','r.expiration','r.aq_invocked'
 							,'v.plan_type','v.policy_type','v.policy_id','v.sim_sessions','v.interim_updates'
 							,'l.limit_type','l.aq_access','l.aq_policy'
@@ -39,18 +39,21 @@ class User {
 		}
 		if( $acctsessionid != NULL AND $acctuniqueid != NULL) {
 			$q->join('radacct as a','u.uname','=','a.username')
+				->where('a.')
 				->addSelect('a.acctinputoctets','a.acctoutputoctets',
 							'a.acctsessiontime','r.active_tpl');
 		}
 		$this->user = $q->first();
-		
-		if( $this->user == NULL )
+
+		if( $this->user == NULL ) {
 			reject("No such user: $this->uname");
+		}
+			
 
 		$this->status['isActive'] = $this->user->status;
 		$this->status['isLimited'] = $this->user->plan_type;
 		$this->status['isUnlimited'] = ! $this->user->plan_type;
-		$this->status['haveAQAccess'] = $this->user->aq_access;
+		$this->status['haveAQAccess'] = $this->user->aq_access ? TRUE : FALSE;
 		return $this;
 	}
 

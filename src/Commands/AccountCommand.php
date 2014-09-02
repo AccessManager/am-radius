@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use AccessManager\Radius\Account\Account;
+use AccessManager\Radius\User;
 
 class AccountCommand extends command {
 
@@ -22,12 +23,14 @@ class AccountCommand extends command {
 		$attributes = parseAttributes($z);
 		$params = ['User-Name','Acct-Session-Id','Acct-Unique-Session-Id',
 					'Acct-Input-Octets','Acct-Output-Octets','Acct-Input-Gigawords',
-					'Acct-Output-Gigawords','Acct-Session-Time'];
+					'Acct-Output-Gigawords','Acct-Session-Time','Acct-Status-Type'];
 		foreach($params as $param) {
 			if( ! array_key_exists($param, $attributes))
 				$output->writeln("Insufficient/Invalid parameters provided.");
 				exit();
 		}
+
+		if( $attributes['Acct-Status-Type'] == 'Start')	exit(0);
 	
 	 		 $username = $params['User-Name'];
 		$acctsessionid = $params['Acct-Session-Id'];

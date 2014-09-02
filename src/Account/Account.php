@@ -39,9 +39,9 @@ class Account {
 		$policy = $this->user->getPolicy();
 
 		if( $policy instanceof PolicySchema ) {
-			$this->policy = new AccountingPolicySchema($user, $this->tpl, $this->sessionTime, $this->inputOctets + $this->outputOctets);
+			$this->policy = new AccountingPolicySchema($this->user, $this->tpl, $this->sessionTime, $this->inputOctets + $this->outputOctets);
 		} else {
-			$this->policy = new AccountingPolicy($user, $this->sessionTime, $this->inputOctets + $this->outputOctets);
+			$this->policy = new AccountingPolicy($this->user, $this->sessionTime, $this->inputOctets + $this->outputOctets);
 		}
 		if ( $this->policy->requestCoA() )
 			$this->CoA();
@@ -56,7 +56,8 @@ class Account {
 
 	public function countData()
 	{
-		$this->countableData = $this->policy->getCountableData();
+		if ($countableData = $this->policy->getCountableData())
+		$this->countableData = $countableData;
 	}
 
 	public function CoA()
@@ -97,8 +98,10 @@ class Account {
 	public function updateDatabase()
 	{
 		$q = Capsule::table('user_recharges')
-				->where('uname',$this->user);
+				->where('user_id',$this->user->id);
+		if( $this->countableTime != NULL || $this->countableTime != FALSE)
 		$q->decrement('time_limit', $this->countableTime);
+		if($this->countableData != NULL || $this->countableData != FALSE)
 		$q->decrement('data_limit', $this->countableData);
 	}
 
@@ -113,7 +116,7 @@ class Account {
         while($process->isRunning() )
         	sleep(3);
 		Capsule::table('user_recharges')
-					->where('uname',$this->user)
+					->where('user_id',$this->user->id)
 					->update(['aq_invocked'=>1]);
 	}
 

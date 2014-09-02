@@ -29,6 +29,8 @@ class AccountingPolicy implements AccountingInterface {
 	{
 		if( $this->user->isUnlimited() || $this->user->aq_invocked )	
 			return FALSE;
+		if( $this->user->isLimited() && ! $this->user->haveAQAccess() )
+			return FALSE;
 
 		if( $this->user->haveTimeLimit() && ( ( $this->user->time_limit - $this->getCountableTime() ) <= 0 ) ) {
 			return TRUE;
