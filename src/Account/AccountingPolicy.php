@@ -32,11 +32,11 @@ class AccountingPolicy implements AccountingInterface {
 		if( $this->user->isLimited() && ! $this->user->haveAQAccess() )
 			return FALSE;
 
-		if( $this->user->haveTimeLimit() && ( ( $this->user->time_limit - $this->getCountableTime() ) <= 0 ) ) {
+		if( $this->user->haveTimeLimit() && $this->user->time_limit <= 0 ) {
 			return TRUE;
 		}
 
-		if( $this->user->haveDataLimit() && ( ( $this->user->data_limit - $this->getCountableData() ) <= 0 ) ) {
+		if( $this->user->haveDataLimit() && $this->user->data_limit <= 0 ) {
 			return TRUE;
 		}
 		return FALSE;

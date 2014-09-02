@@ -33,14 +33,14 @@ class AccountCommand extends command {
 
 		if( $attributes['Acct-Status-Type'] == 'Start')	exit(0);
 	
-	 		 $username = $params['User-Name'];
-		$acctsessionid = $params['Acct-Session-Id'];
-		 $acctuniqueid = $params['Acct-Unique-Session-Id'];
-		  $sessiontime = $params['Acct-Session-Time'];
-		  $inputoctets = $params['Acct-Input-Octets'];
-		 $outputoctets = $params['Acct-Output-Octets'];
-			$inputgigs = $params['Acct-Input-Gigawords'];
-		   $outputgigs = $params['Acct-Output-Gigawords'];
+	 		 $username = $attributes['User-Name'];
+		$acctsessionid = $attributes['Acct-Session-Id'];
+		 $acctuniqueid = $attributes['Acct-Unique-Session-Id'];
+		  $sessiontime = $attributes['Acct-Session-Time'];
+		  $inputoctets = $attributes['Acct-Input-Octets'];
+		 $outputoctets = $attributes['Acct-Output-Octets'];
+			$inputgigs = $attributes['Acct-Input-Gigawords'];
+		   $outputgigs = $attributes['Acct-Output-Gigawords'];
 
 		$account = new Account( ( new User($username) )->fetchAccount($acctsessionid, $acctuniqueid) );
 

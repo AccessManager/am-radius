@@ -112,7 +112,10 @@ class Account {
 
                         $this->shell . " \" | radclient {$session->nasipaddress}:3799 coa {$session->secret}";
 
+        print_r($exec); exit;
+
         $process = new Process($exec);
+        $process->start();
         while($process->isRunning() )
         	sleep(3);
 		Capsule::table('user_recharges')
@@ -132,9 +135,15 @@ class Account {
 		$policy->makeBWPolicy();
 		$attributes = $policy->getReplyAttributes();
 		foreach( $attributes as $attribute ) {
-			$this->shell .= ", {$attribute['attribute']} = {$attribute['value']}";
+			$this->shell .= ", {$attribute['attribute']} = ";
+
+			if($attribute['attribute'] == 'Mikrotik-Rate-Limit')
+				$this->shell .= "'";
+			$this->shell .= "{$attribute['value']}";
+			if($attribute['attribute'] == 'Mikrotik-Rate-Limit')
+				$this->shell .= "'";
 		}
-	}	
+	}
 
 	private function _invokeDisconnect($session)
 	{

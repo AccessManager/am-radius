@@ -39,7 +39,8 @@ class User {
 		}
 		if( $acctsessionid != NULL AND $acctuniqueid != NULL) {
 			$q->join('radacct as a','u.uname','=','a.username')
-				->where('a.')
+				->where('a.acctsessionid',$acctsessionid)
+				->where('a.acctuniqueid',$acctuniqueid)
 				->addSelect('a.acctinputoctets','a.acctoutputoctets',
 							'a.acctsessiontime','r.active_tpl');
 		}
@@ -74,20 +75,20 @@ class User {
 
 	public function limitExpired()
 	{
-		if( $this->user->plan_type == LIMITED AND $this->user->aq_invocked == TRUE ) {
+		if( $this->user->plan_type == LIMITED && $this->user->aq_invocked == TRUE ) {
 			return TRUE;
 		}
-		if( $this->user->limit_type == TIME_LIMIT OR $this->user->limit_type == BOTH_LIMITS ) {
+		if( $this->user->limit_type == TIME_LIMIT || $this->user->limit_type == BOTH_LIMITS ) {
 			return $this->user->time_limit <= 0;
 		}
-		if( $this->user->limit_type == DATA_LIMIT OR $this->user->limit_type == BOTH_LIMITS ) {
+		if( $this->user->limit_type == DATA_LIMIT || $this->user->limit_type == BOTH_LIMITS ) {
 			return $this->user->data_limit <= 0;
 		}
 	}
 
 	public function haveTimeLimit()
 	{
-		if( $this->user->limit_type == TIME_LIMIT OR $this->user->limit_type == BOTH_LIMITS ) {
+		if( $this->user->limit_type == TIME_LIMIT || $this->user->limit_type == BOTH_LIMITS ) {
 			return TRUE;
 		}
 		return FALSE;
@@ -95,7 +96,7 @@ class User {
 
 	public function haveDataLimit()
 	{
-		if( $this->user->limit_type == DATA_LIMIT OR $this->user->limit_type == BOTH_LIMITS ) {
+		if( $this->user->limit_type == DATA_LIMIT || $this->user->limit_type == BOTH_LIMITS ) {
 			return TRUE;
 		}
 		return FALSE;
