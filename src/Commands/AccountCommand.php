@@ -25,9 +25,10 @@ class AccountCommand extends command {
 					'Acct-Input-Octets','Acct-Output-Octets','Acct-Input-Gigawords',
 					'Acct-Output-Gigawords','Acct-Session-Time','Acct-Status-Type'];
 		foreach($params as $param) {
-			if( ! array_key_exists($param, $attributes))
+			if( ! array_key_exists($param, $attributes)) {
 				$output->writeln("Insufficient/Invalid parameters provided.");
 				exit();
+			}
 		}
 
 		if( $attributes['Acct-Status-Type'] == 'Start')	exit(0);
