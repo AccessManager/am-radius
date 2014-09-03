@@ -112,12 +112,11 @@ class Account {
 
                         $this->shell . " \" | radclient {$session->nasipaddress}:3799 coa {$session->secret}";
 
-        print_r($exec); exit;
 
         $process = new Process($exec);
-        $process->start();
-        while($process->isRunning() )
-        	sleep(3);
+        $process->run();
+        if( ! $process->isSuccessful() )	exit("CoA Failed.");
+        
 		Capsule::table('user_recharges')
 					->where('user_id',$this->user->id)
 					->update(['aq_invocked'=>1]);
