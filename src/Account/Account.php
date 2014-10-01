@@ -1,15 +1,15 @@
 <?php
 namespace AccessManager\Radius\Account;
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Capsule\Manager as DB;
 use AccessManager\Radius\Authenticate\PolicySchema;
 use AccessManager\Radius\Authorize\PolicyAttributes;
 use AccessManager\Radius\Authorize\PolicySchemaAttributes;
-use AccessManager\Radius\User;
+use AccessManager\Radius\Interfaces\ServicePlanInterface;
 use Symfony\Component\Process\Process;
 
 class Account {
 
-	private $user;
+	private $plan;
 	private $policy;
 	private $sessionTime;
 	private $inputOctets;
@@ -18,13 +18,12 @@ class Account {
 	private $countableTime;
 	private $countableData;
 	private $shell = NULL;
-	private $tpl = FALSE;
-	private $coa = FALSE;
 	private $activeSessions = NULL;
 
 	public function takeTime($time)
 	{
 		$this->sessionTime = $time;
+		return $this;
 	}
 
 	public function takeData($inputOctets = 0, $inputGigawords = 0, $outputOctets = 0, $outputGigawords = 0)
@@ -32,32 +31,31 @@ class Account {
 		$this->inputOctets = $inputGigawords == 0 ? $inputOctets : $inputOctets + ($inputGigawords * FOUR_GB);
 		$this->outputOctets = $outputGigawords == 0 ? $outputOctets : $outputOctets + ($outputGigawords * FOUR_GB);
 		$this->sessionData = $this->inputOctets + $this->outputOctets;
+		return $this;
 	}
 
 	public function setupAccounting()
 	{
-		$policy = $this->user->getPolicy();
-
-		if( $policy instanceof PolicySchema ) {
-			$this->policy = new AccountingPolicySchema($this->user, $this->tpl, $this->sessionTime, $this->inputOctets + $this->outputOctets);
-		} else {
-			$this->policy = new AccountingPolicy($this->user, $this->sessionTime, $this->inputOctets + $this->outputOctets);
-		}
+		$this->policy = $this->plan->getAccountingPolicy($this->sessionTime, $this->inputOctets + $this->outputOctets);
+		
 		if ( $this->policy->requestCoA() )
 			$this->CoA();
 		if( $this->policy->requestDisconnect())
 			$this->Disconnect();
+		return $this;
 	}
 
 	public function countTime()
 	{
 		$this->countableTime = $this->policy->getCountableTime();
+		return $this;
 	}
 
 	public function countData()
 	{
 		if ($countableData = $this->policy->getCountableData())
 		$this->countableData = $countableData;
+		return $this;
 	}
 
 	public function CoA()
@@ -85,11 +83,11 @@ class Account {
 	private function _fetchActiveSessions()
 	{
 		if( $this->activeSessions == NULL ) {
-			$this->activeSessions = Capsule::table('radacct as a')
+			$this->activeSessions = DB::table('radacct as a')
 									->select('a.nasipaddress','n.secret','a.servicetype',
 											'a.framedipaddress','a.acctsessionid')
 									->join('nas AS n','n.nasname','=','a.nasipaddress')
-									->where('a.username', $this->user)
+									->where('a.username', $this->plan->user->uname)
 									->where('a.acctstoptime', NULL)
 									->get();
 		}
@@ -97,38 +95,26 @@ class Account {
 
 	public function updateDatabase()
 	{
-		$q = Capsule::table('user_recharges')
-				->where('user_id',$this->user->id);
-		if( $this->countableTime != NULL || $this->countableTime != FALSE)
-		$q->decrement('time_limit', $this->countableTime);
-		if($this->countableData != NULL || $this->countableData != FALSE)
-		$q->decrement('data_limit', $this->countableData);
+		$this->plan->updateQuotaBalance($this->countableTime, $this->countableData);
 	}
 
 	private function _invokeCoA($session)
 	{
 		$this->_makeShell();
-		$exec = "echo \" User-Name={$this->user->uname}, Framed-IP-Address= {$session->framedipaddress}, Acct-Session-Id= {$session->acctsessionid}" .
+		$exec = "echo \" User-Name={$this->plan->user->uname}, Framed-IP-Address= {$session->framedipaddress}, Acct-Session-Id= {$session->acctsessionid}" .
 
                         $this->shell . " \" | radclient {$session->nasipaddress}:3799 coa {$session->secret}";
 
-
         $process = new Process($exec);
-        $process->run();
-        if( ! $process->isSuccessful() )	exit("CoA Failed.");
+        $process->start();
         
-		Capsule::table('user_recharges')
-					->where('user_id',$this->user->id)
-					->update(['aq_invocked'=>1]);
+		$this->plan->setAQInvocked();
 	}
 
 	private function _makeShell()
 	{
-		if($this->tpl) {
-			$policy = new PolicySchemaAttributes($this->user, $this->tpl);
-		} else {
-			$policy = new PolicyAttributes($this->user);
-		}
+		$policy = $this->plan->getAuthorizationPolicy();
+		
 		$policy->makeTimeLimit( $this->sessionTime );
 		$policy->makeDataLimit( $this->sessionData );
 		$policy->makeBWPolicy();
@@ -146,22 +132,14 @@ class Account {
 
 	private function _invokeDisconnect($session)
 	{
-		$exec = "echo \" User-Name={$this->user->uname}, Framed-IP-Address= {$session->framedipaddress},".
+		$exec = "echo \" User-Name={$this->plan->uname}, Framed-IP-Address= {$session->framedipaddress},".
                                      " Acct-Session-Id= {$session->acctsessionid} \" | radclient {$session->nasipaddress}:3799 disconnect {$session->secret} ";
 		(new Process($exec) )->start();
 	}
 
-	public function __construct(User $user)
+	public function __construct(ServicePlanInterface $plan)
 	{
-		$this->user = $user;
-		$policy = $this->user->getPolicy();
-
-		if( $policy instanceof PolicySchema ) {
-			$this->tpl = $policy->{date('l')}();
-			$this->policy = new AccountingPolicySchema($user, $this->tpl, $this->sessionTime, $this->inputOctets + $this->outputOctets );
-		} else {
-			$this->policy = new AccountingPolicy($user, $this->sessionTime, $this->inputOctets + $this->outputOctets);
-		}
+		$this->plan = $plan;
 	}
 
 }

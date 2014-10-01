@@ -1,7 +1,7 @@
 <?php
 
-namespace AccessManager\Radius\Authenticate;
-use Exception as Exception;
+namespace AccessManager\Radius\Policies\Authenticate;
+use Exception;
 
 class SchemaTemplate {
 
@@ -101,6 +101,5 @@ class SchemaTemplate {
 		$this->tpl = $template;
 		$this->_makeParameters();
 	}
-}
 
-//end of file SchemaTemplate.php
+}

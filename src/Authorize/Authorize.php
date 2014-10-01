@@ -1,75 +1,108 @@
 <?php
 
 namespace AccessManager\Radius\Authorize;
-use Illuminate\Database\Capsule\Manager as Capsule;
-use AccessManager\Radius\Authorize\PolicyAttributes;
-use AccessManager\Radius\Authorize\PolicySchemaAttributes;
-use AccessManager\Radius\Authenticate\PolicySchema;
+use Illuminate\Database\Capsule\Manager as DB;
+use AccessManager\Radius\Policies\Authorize\PolicyAttributes;
+use AccessManager\Radius\Policies\Authorize\PolicySchemaAttributes;
+use AccessManager\Radius\Policies\Authenticate\Prepaid\PolicySchema;
 use AccessManager\Radius\Helpers\AttributesHelper;
-use AccessManager\Radius\User;
+use AccessManager\Radius\Interfaces\ServicePlanInterface;
+use AccessManager\Radius\Helpers\Database;
 
 class Authorize {
 
 	use AttributesHelper;
 
-	private $user;
-	private $policy;
+	private $plan;
+	// private $policy;
 
 	public function makeCheck()
 	{
 		$this->_addCheck([
-			'Cleartext-Password'	=>	$this->user->clear_pword,
-					'Expiration'	=>	$this->user->expiration,
-			  'Simultaneous-Use'	=>	$this->user->sim_sessions,
+			'Cleartext-Password'	=>	$this->plan->user->clear_pword,
+					'Expiration'	=>	$this->plan->getExpiry(),
+			  'Simultaneous-Use'	=>	$this->plan->sim_sessions,
 			]);
 		return $this;
 	}
 
 	public function makeReply()
 	{
-		$this->policy->makeTimeLimit();
-		$this->policy->makeDataLimit();
-		$this->policy->makeBWPolicy();
+		$policy = $this->plan->getAuthorizationPolicy();
+		$policy->makeTimeLimit();
+		$policy->makeDataLimit();
+		$policy->makeBWPolicy();
+
 		$this->_replyCommon();
-		$this->reply = $this->reply + $this->policy->getReplyAttributes();
+		$this->reply = array_merge($this->reply, $policy->getReplyAttributes());
 		return $this;
 	}
 
 	public function updateRadius()
 	{
-		Capsule::transaction(function(){
-			Capsule::table('radcheck')
-					->where('username', $this->user)
+		print_r($this->check);
+		print_r($this->reply);
+		exit;
+		DB::transaction(function(){
+			DB::table('radcheck')
+					->where('username', $this->plan->user->uname)
 					->delete();
-			Capsule::table('radreply')
-					->where('username', $this->user)
+			DB::table('radreply')
+					->where('username', $this->plan->user->uname)
 					->delete();
-			Capsule::table('radcheck')
+			DB::table('radcheck')
 					->insert($this->check);
-			Capsule::table('radreply')
+			DB::table('radreply')
 					->insert($this->reply);
 		});
+	}
+
+	private function _replySubnet()
+	{
+		$framedip = DB::table('subnet_ips as ip')
+						->where('user_id', $this->user->id)
+						->select('ip.ip')
+						->first();
+
+		if( ! is_null($framedip) ) {
+			$this->_addReply([
+				'Framed-IP-Address'	=>	$framedip->ip,
+				]);
+		}
+
+		$route = DB::table('user_routes as r')
+						->where('r.user_id',$this->user->id)
+						->select('r.subnet')
+						->first();
+		if( ! is_null($route) ) {
+			if( is_null($framedip) ) {
+				$this->_addReply([
+						'Framed-Route'		=>		"{$route->subnet} 0.0.0.0 1",
+					]);
+			} else {
+				$this->_addReply([
+						'Framed-Route'		=>		"{$route->subnet} {$framedip->ip} 11",
+					]);
+			}
+		}
+
 	}
 
 	private function _replyCommon()
 	{
 		$this->_addReply([
-			'Acct-Interim-Interval'		=>	$this->user->interim_updates,
+			'Acct-Interim-Interval'		=>	$this->plan->interim_updates,
 			]);
-		if( ! is_null($this->user->idleTimeout) )
-			$this->_addReply(['Idle-Timeout'	=>	$this->user->idleTimeout]);
+		if( ! is_null($this->plan->idleTimeout) )
+			$this->_addReply(['Idle-Timeout'	=>	$this->plan->idleTimeout]);
+		$this->_replySubnet();
 	}
 
-	public function __construct(User $user)
+	public function __construct(ServicePlanInterface $plan)
 	{
-		$this->user = $user;
-		$policy = $user->getPolicy();
-
-		if( $policy instanceof PolicySchema ) {
-			$this->policy = new PolicySchemaAttributes($user, $policy->{date('l')}() );
-		} else {
-			$this->policy = new PolicyAttributes($user);
-		}
+		$this->plan = $plan;
+		Database::connect();
+		// $this->policy = $plan->getAuthorizationPolicy();
 	}
 
 }

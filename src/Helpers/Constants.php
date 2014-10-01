@@ -35,3 +35,12 @@ define('MB', 1048576);
 
 if( ! defined('GB') )
 define('GB', 1073741824);
+
+if( ! defined('FREE_PLAN') )
+define('FREE_PLAN', 0);
+
+if( ! defined('PREPAID_PLAN') )
+define('PREPAID_PLAN', 1);
+
+if( ! defined('ADVANCEPAID_PLAN') )
+define('ADVANCEPAID_PLAN', 2);

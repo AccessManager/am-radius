@@ -1,13 +1,13 @@
 <?php
 
-namespace AccessManager\Radius\Authorize;
-use AccessManager\Radius\User;
-use AccessManager\Radius\Interfaces\AttributesInterface;
+namespace AccessManager\Radius\Policies\Authorize;
+use AccessManager\Radius\Interfaces\AuthorizationPolicyInterface;
+use AccessManager\Radius\Interfaces\ServicePlanInterface;
+use AccessManager\Radius\Helpers\AttributesHelper;
 
-class PolicySchemaAttributes Implements  AttributesInterface {
+class AuthorizationPolicySchema implements AuthorizationPolicyInterface {
 
-	// use UserProfile;
-	use AttributesHelper;
+		use AttributesHelper;
 	private $user;
 	private $tpl;
 
@@ -69,12 +69,13 @@ class PolicySchemaAttributes Implements  AttributesInterface {
 		}
 	}
 
-	public function __construct(User $user, SchemaTemplate $template)
+	public function __construct(ServicePlanInterface $plan)
 	{
-		$this->user = $user;
-		$this->tpl = $template;
+		$this->user = $plan;
+		$this->tpl = $plan->getPolicy()
+						  ->{date('l')}();
 	}
-
+	
 }
 
-//end of file SchemaAttributeMaker.php
+//end of file AuthorizationPolicySchema.php

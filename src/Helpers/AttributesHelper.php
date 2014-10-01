@@ -20,15 +20,19 @@ trait AttributesHelper {
 
 	private function _addTimeLimit($sessionTime = 0)
 	{
-		if( $this->user->haveTimeLimit() && ! $this->user->haveAQAccess() )
-		return $this->_addReply(['Session-Timeout'=>$this->user->time_limit + $sessionTime]);
-		return $this->_unlimitedTime();
+
+		if( $this->plan->haveTimeLimit() && ! $this->plan->haveAQAccess() )
+			return $this->_addReply([
+				'Session-Timeout'	=>	$this->plan->time_limit + $sessionTime
+				]);
+			return $this->_unlimitedTime();
+		
 	}
 
 	private function _addDataLimit($sessionData = 0)
 	{
-		if( $this->user->haveDataLimit() && ! $this->user->haveAQAccess() ) {
-			$limit = $this->user->data_limit + $sessionData;
+		if( $this->plan->haveDataLimit() && ! $this->plan->haveAQAccess() ) {
+			$limit = $this->plan->data_limit + $sessionData;
 			if( $limit >= FOUR_GB ) {
 				$this->_addReply([
 					'Mikrotik-Total-Limit-Gigawords'	=> intval($limit / FOUR_GB),
@@ -46,7 +50,7 @@ trait AttributesHelper {
 	{
 		foreach ($arr as $k => $v) {
 			$this->check[] = [
-						 'username'	=> 	$this->user->uname,
+						 'username'	=> 	$this->plan->user->uname,
 							   'op'	=>	':=',
 						'attribute' =>	$k,
 							'value' =>	$v,
@@ -57,8 +61,9 @@ trait AttributesHelper {
 	private function _addReply(Array $arr)
 	{
 		foreach ($arr as $k => $v) {
+			// echo " <br/> Adding Attribute $k -> $v <br/>";
 			$this->reply[] = [
-						 'username'	=> 	$this->user->uname,
+						 'username'	=> 	$this->plan->user->uname,
 							   'op'	=>	':=',
 						'attribute' =>	$k,
 							'value' =>	$v,
@@ -68,6 +73,7 @@ trait AttributesHelper {
 
 	private function _unlimitedTime()
 	{
+		// echo "Adding Unlimited Time";
 		$this->_addReply(['Session-Timeout'=>0]);
 	}
 

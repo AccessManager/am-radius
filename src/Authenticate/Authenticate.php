@@ -2,23 +2,24 @@
 
 namespace AccessManager\Radius\Authenticate;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use AccessManager\Radius\Helpers\UserProfile;
+use AccessManager\Radius\Traits\RadiusConstructor;
+// use AccessManager\Radius\Helpers\UserProfile;
 use AccessManager\Radius\Lib\PolicySchema;
 
 class Authenticate {
 
-	use UserProfile;
+	use RadiusConstructor;
 
 	public function checkAccountStatus()
 	{
-		if( ! $this->user->isActive() )
+		if( ! $this->plan->isActive() )
 			reject("Account Not Active.");
 		return $this;
 	}
 
 	public function checkRechargeStatus()
 	{
-		$expiration = $this->user->expiration;
+		$expiration = $this->plan->getExpiry();
 		if(  $expiration == NULL || strtotime($expiration) < time() )
 			reject("Account Not Recharged.");
 		return $this;
@@ -26,7 +27,7 @@ class Authenticate {
 
 	public function isAllowed()
 	{
-		$policy = $this->user->getPolicy();
+		$policy = $this->plan->getPolicy();
 
 		if( $policy instanceof PolicySchema ) {
 			$tpl = $policy->{date('l')}();
@@ -49,9 +50,8 @@ class Authenticate {
 
 	public function checkQuotaStatus()
 	{
-		if( $this->user->isLimited() && $this->user->limitExpired() && ! $this->user->aq_access ) {
+		if( $this->plan->isLimited() && $this->plan->limitExpired() && ! $this->plan->aq_access )
 			reject("Time/Data Limit Exceeded.");
-		}
 		return $this;
 	}
 

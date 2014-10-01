@@ -5,7 +5,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use AccessManager\Radius\User;
+use AccessManager\Radius\UserAccount;
 use AccessManager\Radius\Authenticate\Authenticate;
 use AccessManager\Radius\Authorize\Authorize;
 
@@ -23,15 +23,18 @@ class AuthorizeCommand extends command {
 	{
 		$username = $input->getArgument('username');
 
-		$user = ( new User($username) )->fetchAccount();
+		// $user = ( new User($username) )->fetchAccount();
+		$user = new UserAccount($username);
+		$plan = $user->getActivePlan();
+		$plan->fetchPlanDetails();
 
-		( new Authenticate( $user ) )
+		( new Authenticate( $plan ) )
 					 ->checkAccountStatus()
 					 ->checkRechargeStatus()
 					 ->isAllowed()
 					 ->checkQuotaStatus();
 
-		( new Authorize($user) )
+		( new Authorize($plan) )
 					->makeCheck()
 				 	->makeReply()
 				 	->updateRadius();

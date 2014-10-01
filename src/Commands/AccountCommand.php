@@ -6,7 +6,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use AccessManager\Radius\Account\Account;
-use AccessManager\Radius\User;
+use AccessManager\Radius\UserAccount;
 
 class AccountCommand extends command {
 
@@ -42,14 +42,21 @@ class AccountCommand extends command {
 			$inputgigs = $attributes['Acct-Input-Gigawords'];
 		   $outputgigs = $attributes['Acct-Output-Gigawords'];
 
-		$account = new Account( ( new User($username) )->fetchAccount($acctsessionid, $acctuniqueid) );
+		   $user = new UserAccount($username);
+			$plan = $user->getActivePlan();
+			$plan->fetchPlanDetails($acctsessionid, $acctuniqueid);
 
-		$account->takeTime($sessiontime);
-		$account->takeData($inputoctets, $inputgigs, $outputoctets, $outputgigs);
-		$account->setupAccounting();
-		$account->countTime();
-		$account->countData();
-		$account->updateDatabase();
+			$account = new Account($plan);
+
+		// $account = new Account( ( new User($username) )->fetchAccount($acctsessionid, $acctuniqueid) );
+
+
+		$account->takeTime($sessiontime)
+				->takeData($inputoctets, $inputgigs, $outputoctets, $outputgigs)
+				->setupAccounting()
+				->countTime()
+				->countData()
+				->updateDatabase();
 	}
 	
 }

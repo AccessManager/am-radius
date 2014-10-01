@@ -1,7 +1,7 @@
 <?php
 namespace AccessManager\Radius\Interfaces;
 
-Interface AccountingInterface {
+Interface AccountingPolicyInterface {
 
 	public function getCountableTime();
 

@@ -2,7 +2,7 @@
 
 namespace AccessManager\Radius\Interfaces;
 
-Interface AttributesInterface {
+Interface AuthorizationPolicyInterface {
 
 	public function makeTimeLimit($sessionTime);
 
