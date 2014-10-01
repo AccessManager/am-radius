@@ -2,10 +2,11 @@
 
 namespace AccessManager\Radius\Policies\Authenticate;
 use AccessManager\Radius\Interfaces\AuthenticationPolicyInterface;
+use AccessManager\Radius\Interfaces\AuthenticationPolicySchemaInterface as SchemaInterface;
 use Illuminate\Database\Capsule\Manager as DB;
 use OutOfRangeException;
 
-class PrepaidPolicySchema implements AuthenticationPolicyInterface {
+class PrepaidPolicySchema implements AuthenticationPolicyInterface, SchemaInterface {
 
 	private $schema_id;
 

@@ -35,9 +35,6 @@ class PrepaidPlan implements ServicePlanInterface {
 		}
 		$this->plan = $q->first();
 
-		// $log = DB::getQueryLog();
-		// $query = end ($log);
-		// print_r($query);
 		if( $this->plan == NULL )
 			reject("Account Not Recharged: {$this->user->uname}");
 	}

@@ -14,7 +14,6 @@ class Authorize {
 	use AttributesHelper;
 
 	private $plan;
-	// private $policy;
 
 	public function makeCheck()
 	{
@@ -78,11 +77,10 @@ class Authorize {
 					]);
 			} else {
 				$this->_addReply([
-						'Framed-Route'		=>		"{$route->subnet} {$framedip->ip} 11",
+						'Framed-Route'		=>		"{$route->subnet} {$framedip->ip} 1",
 					]);
 			}
 		}
-
 	}
 
 	private function _replyCommon()
@@ -99,7 +97,6 @@ class Authorize {
 	{
 		$this->plan = $plan;
 		Database::connect();
-		// $this->policy = $plan->getAuthorizationPolicy();
 	}
 
 }

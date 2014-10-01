@@ -46,12 +46,8 @@ class AccountCommand extends command {
 			$plan = $user->getActivePlan();
 			$plan->fetchPlanDetails($acctsessionid, $acctuniqueid);
 
-			$account = new Account($plan);
-
-		// $account = new Account( ( new User($username) )->fetchAccount($acctsessionid, $acctuniqueid) );
-
-
-		$account->takeTime($sessiontime)
+		(new Account($plan) )
+				->takeTime($sessiontime)
 				->takeData($inputoctets, $inputgigs, $outputoctets, $outputgigs)
 				->setupAccounting()
 				->countTime()

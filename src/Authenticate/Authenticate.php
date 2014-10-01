@@ -3,8 +3,8 @@
 namespace AccessManager\Radius\Authenticate;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use AccessManager\Radius\Traits\RadiusConstructor;
-// use AccessManager\Radius\Helpers\UserProfile;
 use AccessManager\Radius\Lib\PolicySchema;
+use AccessManager\Radius\Interfaces\AuthenticationPolicySchemaInterface as SchemaInterface;
 
 class Authenticate {
 
@@ -29,7 +29,7 @@ class Authenticate {
 	{
 		$policy = $this->plan->getPolicy();
 
-		if( $policy instanceof PolicySchema ) {
+		if( $policy instanceof SchemaInterface ) {
 			$tpl = $policy->{date('l')}();
 			
 			switch ($tpl->access) {

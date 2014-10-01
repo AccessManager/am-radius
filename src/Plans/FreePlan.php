@@ -35,7 +35,6 @@ class FreePlan implements ServicePlanInterface {
 	{
 		$this->query = DB::table('user_accounts as u')
 							->leftJoin('free_balance as b','b.user_id','=','u.id')
-							// ->leftJoin('free_plan as p','p.id','=','b.id')
 							->where('u.id',$this->user->id)
 							->select('b.time_balance as time_limit','b.data_balance as data_limit', 'b.expiration', 'u.clear_pword'
 								,'b.plan_type','b.limit_type','b.bw_policy','b.sim_sessions',
@@ -47,7 +46,6 @@ class FreePlan implements ServicePlanInterface {
 	{
 		$this->_buildAuthorizationQuery();
 		$this->query
-					// ->join('user_accounts as u','u.id','=','b.user_id')
 					->join('radacct AS a','u.uname','=','a.username')
 					->where('a.acctsessionid', $acctsessionid)
 					->where('a.acctuniqueid', $acctuniqueid)

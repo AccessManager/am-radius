@@ -6,12 +6,10 @@ use AccessManager\Radius\Helpers\AttributesHelper;
 use AccessManager\Radius\Helpers\Database;
 use AccessManager\Radius\Interfaces\ServicePlanInterface;
 
-// use AccessManager\Radius\Helpers\UserProfile;
-
 class AuthorizationPolicy implements AuthorizationPolicyInterface {
 
 	use AttributesHelper;
-	// use UserProfile;
+	
 	private $plan;
 
 	public function makeTimeLimit($sessionTime = 0)

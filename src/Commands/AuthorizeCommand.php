@@ -23,7 +23,6 @@ class AuthorizeCommand extends command {
 	{
 		$username = $input->getArgument('username');
 
-		// $user = ( new User($username) )->fetchAccount();
 		$user = new UserAccount($username);
 		$plan = $user->getActivePlan();
 		$plan->fetchPlanDetails();
