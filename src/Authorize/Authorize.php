@@ -40,9 +40,6 @@ class Authorize {
 
 	public function updateRadius()
 	{
-		print_r($this->check);
-		print_r($this->reply);
-		exit;
 		DB::transaction(function(){
 			DB::table('radcheck')
 					->where('username', $this->plan->user->uname)
