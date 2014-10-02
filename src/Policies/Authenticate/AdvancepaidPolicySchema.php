@@ -45,6 +45,7 @@ class AdvancepaidPolicySchema implements AuthenticationPolicyInterface, SchemaIn
 	public function __construct($schema_id)
 	{
 		$this->schema_id = $schema_id;
+		Database::connect();
 	}
 
 }

@@ -34,8 +34,8 @@ class AdvancepaidPolicy implements AuthenticationPolicyInterface {
 
 	public function __construct($policy_id)
 	{
-		Database::connect();
 		$this->_fetchPolicy($policy_id);
+		Database::connect();
 	}
 }
 
