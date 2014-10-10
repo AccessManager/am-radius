@@ -36,9 +36,10 @@ class FreePlan implements ServicePlanInterface {
 		$this->query = DB::table('user_accounts as u')
 							->leftJoin('free_balance as b','b.user_id','=','u.id')
 							->where('u.id',$this->user->id)
-							->select('b.time_balance as time_limit','b.data_balance as data_limit', 'b.expiration', 'u.clear_pword'
-								,'b.plan_type','b.limit_type','b.bw_policy','b.sim_sessions',
-								'b.aq_access','b.aq_policy','b.interim_updates','b.aq_invocked'
+							->select('b.time_balance as time_limit','b.data_balance as data_limit', 
+								'b.expiration', 'u.clear_pword','b.plan_type','b.limit_type',
+								'b.bw_policy','b.sim_sessions','b.aq_access','b.aq_policy',
+								'b.interim_updates','b.aq_invocked'
 								);
 	}
 
@@ -107,7 +108,7 @@ class FreePlan implements ServicePlanInterface {
 
 	public function getExpiry()
 	{
-		return date("d M Y H:i", time() + "1 Month");
+		return $this->plan->expiration;
 	}
 
 	public function getPolicy()

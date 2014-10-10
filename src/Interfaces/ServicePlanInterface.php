@@ -22,6 +22,8 @@ Interface ServicePlanInterface {
 
 	public function haveAQAccess();
 
+	public function getExpiry();
+
 	public function getPolicy();
 
 	public function getAuthorizationPolicy();

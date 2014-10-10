@@ -56,18 +56,19 @@ class Authorize {
 	private function _replySubnet()
 	{
 		$framedip = DB::table('subnet_ips as ip')
-						->where('user_id', $this->user->id)
+						->where('user_id', $this->plan->user->id)
 						->select('ip.ip')
 						->first();
 
 		if( ! is_null($framedip) ) {
+			$static_ip = long2ip($framedip->ip);
 			$this->_addReply([
-				'Framed-IP-Address'	=>	$framedip->ip,
+				'Framed-IP-Address'	=>	$static_ip,
 				]);
 		}
 
 		$route = DB::table('user_routes as r')
-						->where('r.user_id',$this->user->id)
+						->where('r.user_id',$this->plan->user->id)
 						->select('r.subnet')
 						->first();
 		if( ! is_null($route) ) {
@@ -76,8 +77,9 @@ class Authorize {
 						'Framed-Route'		=>		"{$route->subnet} 0.0.0.0 1",
 					]);
 			} else {
+				$static_ip = long2ip($framedip->ip);
 				$this->_addReply([
-						'Framed-Route'		=>		"{$route->subnet} {$framedip->ip} 1",
+						'Framed-Route'		=>		"{$route->subnet} {$static_ip} 1",
 					]);
 			}
 		}

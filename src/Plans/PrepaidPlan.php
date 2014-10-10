@@ -135,6 +135,11 @@ class PrepaidPlan implements ServicePlanInterface {
 		return $this->plan->aq_access ? TRUE : FALSE;
 	}
 
+	public function getExpiry()
+	{
+		return $this->plan->expiration;
+	}
+
 	public function updateQuotaBalance($countableTime, $countableData)
 	{
 		$q = DB::table('user_recharges')
