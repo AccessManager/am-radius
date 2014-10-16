@@ -21,7 +21,7 @@ class Authenticate {
 	{
 		$expiration = $this->plan->getExpiry();
 		if(  $expiration == NULL || strtotime($expiration) < time() )
-			reject("Account Not Recharged.");
+			reject("Account Not Recharged or Service Validity Expired.");
 		return $this;
 	}
 
