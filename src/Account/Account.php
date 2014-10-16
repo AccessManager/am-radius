@@ -6,6 +6,7 @@ use AccessManager\Radius\Authorize\PolicyAttributes;
 use AccessManager\Radius\Authorize\PolicySchemaAttributes;
 use AccessManager\Radius\Interfaces\ServicePlanInterface;
 use Symfony\Component\Process\Process;
+use DateTime;
 
 class Account {
 
@@ -96,6 +97,16 @@ class Account {
 	public function updateDatabase()
 	{
 		$this->plan->updateQuotaBalance($this->countableTime, $this->countableData);
+		$this->_disconnectExpired();
+	}
+
+	private function _disconnectExpired()
+	{
+		$expiry = DateTime::createFromFormat('d M Y H:i', $this->plan->getExpiry() );
+		if( $expiry->getTimeStamp() <= time() ) {
+			$this->Disconnect();
+		}
+		
 	}
 
 	private function _invokeCoA($session)

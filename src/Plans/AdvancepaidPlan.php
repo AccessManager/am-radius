@@ -121,11 +121,6 @@ class AdvancepaidPlan Implements ServicePlanInterface {
 		return date('d M Y H:i', $expiration);
 	}
 
-	public function getTerminationTime()
-	{
-		return date("Y-m-d\TH:i:s", strtotime("+1 Day"));
-	}
-
 	public function getPolicy()
 	{
 		switch( $this->plan->policy_type) {
