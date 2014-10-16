@@ -110,7 +110,20 @@ class AdvancepaidPlan Implements ServicePlanInterface {
 
 	public function getExpiry()
 	{
-		return date("d M Y H:i", strtotime("+1 Month"));
+		$billing_cycle = DB::table('billing_cycles as c')
+						->where('user_id',$this->user->id)
+						->select('c.expiration')
+						->first();
+		$expiration = strtotime($billing_cycle->expiration);
+
+		if( $expiration <= strtotime('1970-01-02') )
+			return date("d M Y H:i", strtotime("+1 Month"));
+		return date('d M Y H:i', $expiration);
+	}
+
+	public function getTerminationTime()
+	{
+		return date("Y-m-d\TH:i:s", strtotime("+1 Day"));
 	}
 
 	public function getPolicy()
