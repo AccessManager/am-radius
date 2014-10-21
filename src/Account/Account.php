@@ -100,13 +100,12 @@ class Account {
 		$this->_disconnectExpired();
 	}
 
-	private function _disconnectExpired()
+	public function disconnectExpired()
 	{
 		$expiry = DateTime::createFromFormat('d M Y H:i', $this->plan->getExpiry() );
 		if( $expiry->getTimeStamp() <= time() ) {
 			$this->Disconnect();
 		}
-		
 	}
 
 	private function _invokeCoA($session)
@@ -143,8 +142,8 @@ class Account {
 
 	private function _invokeDisconnect($session)
 	{
-		$exec = "echo \" User-Name={$this->plan->uname}, Framed-IP-Address= {$session->framedipaddress},".
-                                     " Acct-Session-Id= {$session->acctsessionid} \" | radclient {$session->nasipaddress}:3799 disconnect {$session->secret} ";
+		$exec = "echo \" User-Name={$this->plan->uname}, Framed-IP-Address={$session->framedipaddress} \" ".
+                                     "| radclient {$session->nasipaddress}:3799 disconnect {$session->secret}";
 		(new Process($exec) )->start();
 	}
 

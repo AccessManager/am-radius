@@ -30,8 +30,8 @@ class AccountCommand extends command {
 				exit();
 			}
 		}
-
-		if( $attributes['Acct-Status-Type'] == 'Start')	exit(0);
+		$requestType = $attributes['Acct-Status-Type'];
+		if( $requestType == 'Start')	exit(0);
 	
 	 		 $username = $attributes['User-Name'];
 		$acctsessionid = $attributes['Acct-Session-Id'];
@@ -46,13 +46,18 @@ class AccountCommand extends command {
 			$plan = $user->getActivePlan();
 			$plan->fetchPlanDetails($acctsessionid, $acctuniqueid);
 
-		(new Account($plan) )
-				->takeTime($sessiontime)
+		$account = new Account($plan);
+
+		$account->takeTime($sessiontime)
 				->takeData($inputoctets, $inputgigs, $outputoctets, $outputgigs)
 				->setupAccounting()
 				->countTime()
 				->countData()
 				->updateDatabase();
+		if( $requestType != 'Stop' )
+		{
+			$account->disconnectExpired();
+		}
 	}
 	
 }
