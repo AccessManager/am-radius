@@ -142,7 +142,7 @@ class Account {
 
 	private function _invokeDisconnect($session)
 	{
-		$exec = "echo \" User-Name={$this->plan->uname}, Framed-IP-Address={$session->framedipaddress} \" ".
+		$exec = "echo \" User-Name={$this->plan->user->uname}, Framed-IP-Address={$session->framedipaddress} \" ".
                                      "| radclient {$session->nasipaddress}:3799 disconnect {$session->secret}";
 		(new Process($exec) )->start();
 	}
