@@ -10,7 +10,9 @@ class FrinternetCron {
 	public function resetQuotaBalance()
 	{
 		$accounts = DB::table('free_balance as b')
-						->select('b.plan_type','b.limit_type','b.time_limit','b.time_unit','b.time_balance'
+						->select('b.user_id','b.plan_type','b.limit_type','b.time_limit'
+							,'b.time_unit','b.time_balance','b.aq_access'
+
 							,'b.data_limit','b.data_unit','b.data_balance','b.reset_every','b.reset_unit','b.last_reset_on')
 						->get();
 		foreach( $accounts as $account )
@@ -32,12 +34,12 @@ class FrinternetCron {
 				$new['time_balance'] = $account->time_limit * constant( $account->time_unit );
 			if( $account->limit_type == DATA_LIMIT || $account->limit_type == BOTH_LIMITS )
 				$new['data_balance'] = $account->data_limit * constant( $account->data_unit );
-			if( $account->aq_access-> ALLOWED )
+			if( $account->aq_access == ALLOWED )
 				$new['aq_invocked'] = 0;
 		}
 		DB::table('free_balance')
 					->where('user_id', $account->user_id)
-					->update(($new);
+					->update($new);
 	}
 
 	public function __construct()
