@@ -12,7 +12,7 @@ class AccountingPolicy implements AccountingPolicyInterface {
 
 	public function getCountableTime()
 	{
-		if( $this->plan->isUnlimited() || $this->plan->aq_invocked )	return FALSE;
+		if( $this->plan->isUnlimited() ||( $this->plan->isLimited() && $this->plan->aq_invocked ) )	return FALSE;
 
 		if( $this->plan->haveTimeLimit() )
 			return $this->sessionTime - $this->plan->acctsessiontime;
@@ -21,7 +21,7 @@ class AccountingPolicy implements AccountingPolicyInterface {
 
 	public function getCountableData()
 	{
-		if( $this->plan->isUnlimited() || $this->plan->aq_invocked )	return FALSE;
+		if( $this->plan->isUnlimited() || ( $this->plan->isLimited() && $this->plan->aq_invocked ) )	return FALSE;
 
 		if( $this->plan->haveDataLimit() )
 			return $this->sessionData - ( $this->plan->acctinputoctets + $this->plan->acctoutputoctets );
