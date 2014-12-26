@@ -97,7 +97,7 @@ class Account {
 	public function updateDatabase()
 	{
 		$this->plan->updateQuotaBalance($this->countableTime, $this->countableData);
-		$this->_disconnectExpired();
+		$this->disconnectExpired();
 	}
 
 	public function disconnectExpired()
