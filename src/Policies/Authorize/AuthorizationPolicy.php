@@ -26,9 +26,9 @@ class AuthorizationPolicy implements AuthorizationPolicyInterface {
 		return $this->_addDataLimit($sessionData);
 	}
 	
-	public function makeBWPolicy()
+	public function makeBWPolicy($primaryPolicy = FALSE)
 	{
-		if( $this->plan->isLimited() && $this->plan->limitExpired() )
+		if( $this->plan->isLimited() && $this->plan->limitExpired() && ! $primaryPolicy )
 			return $this->_addReply(['Mikrotik-Rate-Limit' => $this->plan->aq_policy]);
 		return $this->_addReply(['Mikrotik-Rate-Limit' => $this->plan->getPolicy()->getBWPolicy()]);
 	}

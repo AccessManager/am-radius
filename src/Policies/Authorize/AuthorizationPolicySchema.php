@@ -42,10 +42,10 @@ class AuthorizationPolicySchema implements AuthorizationPolicyInterface {
 			return $this->_addDataLimit($sessionData);
 	}
 
-	public function makeBWPolicy()
+	public function makeBWPolicy($primaryPolicy = FALSE)
 	{
 		if( $this->tpl->haveFullDayAccess() ) {
-			if( $this->tpl->isAccountable() && $this->user->limitExpired() ) {
+			if( $this->tpl->isAccountable() && $this->user->limitExpired() && ! $primaryPolicy ) {
 				return $this->_addReply(['Mikrotik-Rate-Limit'=>$this->user->aq_policy]);
 			} else {
 			return $this->_addReply(['Mikrotik-Rate-Limit'=>$this->tpl->bw_policy]);
@@ -53,7 +53,7 @@ class AuthorizationPolicySchema implements AuthorizationPolicyInterface {
 		}
 
 		if( $this->tpl->isInPrimaryTime() ) {
-			if( $this->tpl->isPrimaryAccountable() && $this->user->limitExpired() ) {
+			if( $this->tpl->isPrimaryAccountable() && $this->user->limitExpired() && ! $primaryPolicy ) {
 				return $this->_addReply(['Mikrotik-Rate-Limit'=>$this->user->aq_policy]);
 			} else {
 				return $this->_addReply( ['Mikrotik-Rate-Limit'=>$this->tpl->pr_policy] );
@@ -61,7 +61,7 @@ class AuthorizationPolicySchema implements AuthorizationPolicyInterface {
 		}
 
 		if( $this->tpl->isInSecondaryTime() ) {
-			if( $this->tpl->isSecondaryAccountable() && $this->user->limitExpired() ) {
+			if( $this->tpl->isSecondaryAccountable() && $this->user->limitExpired() && ! $primaryPolicy ) {
 				return $this->_addReply(['Mikrotik-Rate-Limit'=>$this->user->aq_policy]);
 			} else {
 				return $this->_addReply( ['Mikrotik-Rate-Limit'=>$this->tpl->sec_policy] );

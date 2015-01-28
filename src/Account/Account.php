@@ -12,14 +12,15 @@ class Account {
 
 	private $plan;
 	private $policy;
-	private $sessionTime;
-	private $inputOctets;
-	private $outputOctets;
-	private $sessionData;
+	private $sessionTime = 0;
+	private $inputOctets = 0;
+	private $outputOctets = 0;
+	private $sessionData = 0;
 	private $countableTime;
 	private $countableData;
 	private $shell = NULL;
 	private $activeSessions = NULL;
+	private $primaryPolicy = FALSE;
 
 	public function takeTime($time)
 	{
@@ -39,8 +40,10 @@ class Account {
 	{
 		$this->policy = $this->plan->getAccountingPolicy($this->sessionTime, $this->inputOctets + $this->outputOctets);
 		
-		if ( $this->policy->requestCoA() )
+		if ( $this->policy->requestCoA() ) {
 			$this->CoA();
+			$this->plan->setAQInvocked();
+		}
 		if( $this->policy->requestDisconnect())
 			$this->Disconnect();
 		return $this;
@@ -59,8 +62,9 @@ class Account {
 		return $this;
 	}
 
-	public function CoA()
+	public function CoA($primaryPolicy = FALSE)
 	{
+		$this->primaryPolicy = $primaryPolicy;
 		$this->_fetchActiveSessions();
 		$this->_makeShell();
 
@@ -117,8 +121,6 @@ class Account {
 
         $process = new Process($exec);
         $process->start();
-        
-		$this->plan->setAQInvocked();
 	}
 
 	private function _makeShell()
@@ -127,7 +129,7 @@ class Account {
 		
 		$policy->makeTimeLimit( $this->sessionTime );
 		$policy->makeDataLimit( $this->sessionData );
-		$policy->makeBWPolicy();
+		$policy->makeBWPolicy($this->primaryPolicy);
 		$attributes = $policy->getReplyAttributes();
 		foreach( $attributes as $attribute ) {
 			$this->shell .= ", {$attribute['attribute']} = ";

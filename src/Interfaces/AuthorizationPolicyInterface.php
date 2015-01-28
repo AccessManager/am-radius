@@ -8,7 +8,7 @@ Interface AuthorizationPolicyInterface {
 
 	public function makeDataLimit($sessionData);
 
-	public function makeBWPolicy();
+	public function makeBWPolicy($primaryPolicy);
 
 	public function getCheckAttributes();
 
