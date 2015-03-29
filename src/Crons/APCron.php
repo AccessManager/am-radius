@@ -11,6 +11,7 @@ class APCron {
 
 		$accounts = DB::table('ap_active_plans as p')
 					->leftJoin('ap_limits as l','l.id','=','p.limit_id')
+					->join('billing_cycles as c','c.user_id','=','p.user_id')
 					->where( 'plan_type', LIMITED )
 					->select('l.limit_type','p.time_balance','p.data_balance','l.time_limit','l.time_unit','l.aq_access',
 						'l.aq_access','l.data_limit','l.data_unit','p.validity','p.validity_unit','p.last_reset_on')
