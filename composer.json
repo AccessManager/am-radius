@@ -10,18 +10,16 @@
 		],
 	"require" : {
 		"php" : ">=5.4",
-		"illuminate/database" : "*",
+		"access-manager/am-helpers" : "0.*",
+		"access-manager/am-constants" : "0.*",
+		"illuminate/database" : "5.*",
 		"symfony/console"	: "*",
 		"symfony/process"	: "*"
 		},
 	"autoload" : {
 			"psr-4" : {
 				"AccessManager\\Radius\\" : "src"
-				},
-			"files" : [
-				"src/Helpers/Helpers.php",
-				"src/Helpers/Constants.php"
-			]
+				}
 		},
 	"config": {
 		"preferred-install": "dist"
