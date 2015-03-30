@@ -88,7 +88,7 @@ class FreePlan implements ServicePlanInterface {
 
 	public function isActive()
 	{
-		return $this->user->status;
+		return $this->user->status == ACTIVE ? TRUE : FALSE;
 	}
 
 	public function isLimited()
